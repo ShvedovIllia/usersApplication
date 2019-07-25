@@ -1,61 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>UserApp</TItle>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div id= "showPanel">
-       <h3>SHOW</h3>
-       <div id="showResult">
-            <pre id="showResultJson"></pre>
-       </div>
-    </div>
-    <div id= "controlPanel">
-        <div id="nameOfPanel">
-            <h3>JSON</h3>  
-        </div>
-        <div id="button">
-            <h3>Control panel</h3>
-            <button onclick="showAllUsers()">Show All Users</button>
-            <button onclick="hideAllUsers()">Hide All Users</button>
-            <button onclick="toogleUsers()">Toogle Users</button>
-            <button onclick="sortInReverseOrderById()">Reverse Order By Id</button>
-            <button onclick="sortByName()">Sort by name</button>
-            <button onclick="changeToJsonView()">change To Json View</button>
-            <div id="searchElement">
-                <button onclick="searchByName()">Search by name</button>
-                <input id="searchField" type="text">
+    <div id="wrapper">
+        <div id="showPanel">
+            <h3 id="showHeader">SHOW</h3>
+            <div id="showResult">
+                <h1 id="userCounter">Found 0 user =(</h1>
+                <pre id="showResultJson"></pre>
             </div>
         </div>
-        <div id="nameOfPanel">
-            <br>
-            <h3>CARDS</h3>  
-        </div>
-        <div id="button">
-            <h3>Control panel</h3>
-            <button onclick="changeShowPanelToCards()">change show panel to cards</button>
-            
-            <button onclick="hideAllCards()">Hide all</button>
-            <div id="cardMenu">
+        <div id="controlPanel">
+            <div id="nameOfPanel">
+                <h3>JSON</h3>
+            </div>
+            <div id="button">
+                <h3>Control panel</h3>
+                <button onclick="showAllUsers()">Show all users</button>
+                <button onclick="hideAllUsers()">Hide all users</button>
+                <button onclick="toogleUsers()">Toogle users</button>
+                <button onclick="sortInReverseOrderById()">Reverse order by id</button>
+                <button onclick="sortByName()">Sort by name</button>
+                <button onclick="changeToJsonView()">Change to json view</button>
+                <div id="searchElement">
+                    <button onclick="searchByName()">Search by name</button>
+                    <input id="searchField" type="text">
+                </div>
+            </div>
+            <div id="nameOfPanel">
+                <br>
+                <h3>CARDS</h3>
+            </div>
+            <div id="button">
+                <h3>Control panel</h3>
+                <button onclick="changeShowPanelToCards()">Change to card view</button>
+                <button onclick="hideAllCards()">Hide all</button>
+                <div id="cardMenu">
                     <label for="idOfNewCard">ID: </label>
-                    <input id="idOfNewCard" type="text" ><br>
+                    <input id="idOfNewCard" type="text"><br>
                     <label for="nameOfNewCard">NAME: </label>
-                    <input id="nameOfNewCard" type="text" ><br>
+                    <input id="nameOfNewCard" type="text"><br>
                     <label for="usernameOfNewCard">USERNAME: </label>
-                    <input id="usernameOfNewCard" type="text" ><br>
+                    <input id="usernameOfNewCard" type="text"><br>
                     <label for="emailOfNewCard">EMAIL: </label>
-                    <input id="emailOfNewCard" type="text" ><br>
+                    <input id="emailOfNewCard" type="text"><br>
                     <label for="phoneOfnewCard">PHONE: </label>
-                    <input id="phoneOfNewCard" type="text" ><br>
+                    <input id="phoneOfNewCard" type="text"><br>
                     <label for="websiteOfNewCard">WEBSITE: </label>
-                    <input id="websiteOfNewCard" type="text" ><br>
+                    <input id="websiteOfNewCard" type="text"><br>
+                    <label for="cityOfNewCard">CITY: </label>
+                    <input id="cityOfNewCard" type="text"><br>
                     <button onclick="addCard()">Add card</button>
                     <button onclick="editCard()">Edit card</button>
+                </div>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>  
+    <script src="script.js"></script>
 </body>
+
 </html>

@@ -1,47 +1,78 @@
 body {
     height: 100%;
     width: 100%;
-    display: inline-flex;
 }
-#showPanel { 
-    position: absolute; 
-    left: 0; 
-    top: 0; 
+
+#showPanel {
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 70%;
-    outline:1px solid black;
+    outline: 1px solid black;
     height: 100%;
-    overflow:auto;
-    background-color: rgb(140, 191, 236);
+    overflow: auto;
+    background-image: linear-gradient(black, white);
 }
+
 #controlPanel {
-     position: absolute; 
-     right: 0; 
-     top: 0;
-     width: 30%; 
-     outline:1px solid black;
-     height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30%;
+    outline: 1px solid black;
+    height: 100%;
 }
+
 #nameOfPanel {
     border-bottom: 1px solid black;
     margin-bottom: -1px;
-    
 }
+
 #showResultJson {
     background-color: aliceblue
 }
+
 #button {
     margin: 20px;
 }
+
 #searchElement {
-    outline:1px solid black;
+    outline: 1px solid black;
 }
+
 h3 {
     text-align: center;
-    font-family: Franklin Gothic Medium,Franklin Gothic,ITC Franklin Gothic,Arial,sans-serif; 
+    font-family: Franklin Gothic Medium, Franklin Gothic, ITC Franklin Gothic, Arial, sans-serif;
 }
+
 #showResult {
     margin: 10px;
 }
+
 button {
+    color: #444444;
+    background: #F3F3F3;
+    border: 1px #DADADA solid;
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 9pt;
+    outline: none;
     margin: 10px;
+}
+
+button:hover {
+    border: 1px #C6C6C6 solid;
+    box-shadow: 1px 1px 1px #EAEAEA;
+    color: #333333;
+    background: #F7F7F7;
+}
+
+button:active {
+    box-shadow: inset 12px 12px 12px #DFDFDF;
+}
+
+#showHeader,
+#userCounter {
+    color: #F3F3F3;
 }
