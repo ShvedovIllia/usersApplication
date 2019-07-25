@@ -1,0 +1,47 @@
+body {
+    height: 100%;
+    width: 100%;
+    display: inline-flex;
+}
+#showPanel { 
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    width: 70%;
+    outline:1px solid black;
+    height: 100%;
+    overflow:auto;
+    background-color: rgb(140, 191, 236);
+}
+#controlPanel {
+     position: absolute; 
+     right: 0; 
+     top: 0;
+     width: 30%; 
+     outline:1px solid black;
+     height: 100%;
+}
+#nameOfPanel {
+    border-bottom: 1px solid black;
+    margin-bottom: -1px;
+    
+}
+#showResultJson {
+    background-color: aliceblue
+}
+#button {
+    margin: 20px;
+}
+#searchElement {
+    outline:1px solid black;
+}
+h3 {
+    text-align: center;
+    font-family: Franklin Gothic Medium,Franklin Gothic,ITC Franklin Gothic,Arial,sans-serif; 
+}
+#showResult {
+    margin: 10px;
+}
+button {
+    margin: 10px;
+}
