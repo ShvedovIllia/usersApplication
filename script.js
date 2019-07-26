@@ -1,15 +1,15 @@
 var result = document.getElementById('showResultJson');
 var showResultTag = document.getElementById('showResult');
-var countOfUserField = document.getElementById('userCounter');
-var json;
-var jsonArray;
+var userCounter = document.getElementById('userCounter');
+var usersJson;
+var usersArray;
 
 fetch("https://jsonplaceholder.typicode.com/users").then(function (response) {
     return response.json();
 }).then(
     function (jsondata) {
-        json = JSON.stringify(jsondata, null, 2);
-        jsonArray = JSON.parse(json);
+        usersJson = JSON.stringify(jsondata, null, 2);
+        usersArray = JSON.parse(usersJson);
     }
 )
 
@@ -20,20 +20,20 @@ function changeToJsonView() {
 }
 
 function showAllUsers() {
-    jsonArray = JSON.parse(json);
-    result.innerHTML = json;
-    countOfUserField.innerHTML = 'Found ' + jsonArray.length + ' users!';
+    usersArray = JSON.parse(usersJson);
+    result.innerHTML = usersJson;
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 
 function hideAllUsers() {
     result.innerHTML = '';
-    countOfUserField.innerHTML = 'Found 0 users! =(';
+    userCounter.innerHTML = 'Found 0 users! =(';
 }
 
 function toogleUsers() {
     if (result.textContent == '') {
-        result.innerHTML = JSON.stringify(jsonArray, null, 2);
-        countOfUserField.innerHTML = 'Found ' + jsonArray.length + ' users!';
+        result.innerHTML = JSON.stringify(usersArray, null, 2);
+        userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
     } else {
         hideAllUsers();
     }
@@ -41,33 +41,23 @@ function toogleUsers() {
 var changer = new changeStatus();
 
 function sortInReverseOrderById() {
-    let sortJson = jsonArray.sort((a, b) => b.id - a.id);
     let status = changer.change();
-    if (!status) {
-        sortJson = jsonArray.sort((a, b) => a.id - b.id);
-    } else if (status) {
-        sortJson = jsonArray.sort((a, b) => b.id - a.id);
-    }
-    result.innerHTML = JSON.stringify(sortJson, null, 2);
-    countOfUserField.innerHTML = 'Found ' + sortJson.length + ' users!';
+    status == false ? usersArray.sort((a, b) => a.id - b.id) : usersArray.sort((a, b) => b.id - a.id);
+    result.innerHTML = JSON.stringify(usersArray, null, 2);
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 
 function changeStatus() {
     let status;
     this.change = function () {
-        if (status) {
-            status = false;
-            return status;
-        } else if (!status) {
-            status = true;
-            return status;
-        }
+        status = !status;
+        return status;
     }
 }
 
 function sortByName() {
     let status = changer.change();
-    let sortJson = jsonArray.sort((a, b) => {
+    usersArray.sort((a, b) => {
         if (a.name.toUpperCase() > b.name.toUpperCase()) {
             return status == true ? 1 : -1;
         }
@@ -76,36 +66,35 @@ function sortByName() {
         }
         return 0;
     });
-    result.innerHTML = JSON.stringify(sortJson, null, 2);
-    countOfUserField.innerHTML = 'Found ' + sortJson.length + ' users!';
+    result.innerHTML = JSON.stringify(usersArray, null, 2);
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 
 function searchByName() {
     let names = [];
     let searchValue = document.getElementById('searchField').value;
-    for (let i = 0; i < jsonArray.length; i++) {
-        if (jsonArray[i].name.match(searchValue)) {
-            names.push(jsonArray[i]);
+    for (let i = 0; i < usersArray.length; i++) {
+        if (usersArray[i].name.match(searchValue)) {
+            names.push(usersArray[i]);
         }
     }
-    jsonArray = names;
-    result.innerHTML = JSON.stringify(names, null, 2);
-    countOfUserField.innerHTML = 'Found ' + names.length + ' users!';
+    result.innerHTML = JSON.stringify(usersArray, null, 2);
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 var counter = new itemIdCounter();
 
 function changeShowPanelToCards() {
     hideAllUsers();
-    for (let i = 0; i < jsonArray.length; i++) {
+    for (let i = 0; i < usersArray.length; i++) {
         createDivForCard();
         document.getElementById('div' + counter.getCount()).innerHTML =
-            "<p class='classOfCards'>Id: " + jsonArray[i].id + "</p>" +
-            "<p>Name: " + jsonArray[i].name + "</p>" +
-            "<p>Username: " + jsonArray[i].username + "</p>" +
-            "<p>Email: " + jsonArray[i].email + "</p>" +
-            "<p>Phone: " + jsonArray[i].phone + "</p>" +
-            "<p>Website: " + jsonArray[i].website + "</p>" +
-            "<p>City: " + jsonArray[i].address.city + "</p>";
+            "<p class='classOfCards'>Id: " + usersArray[i].id + "</p>" +
+            "<p>Name: " + usersArray[i].name + "</p>" +
+            "<p>Username: " + usersArray[i].username + "</p>" +
+            "<p>Email: " + usersArray[i].email + "</p>" +
+            "<p>Phone: " + usersArray[i].phone + "</p>" +
+            "<p>Website: " + usersArray[i].website + "</p>" +
+            "<p>City: " + usersArray[i].address.city + "</p>";
     }
 }
 

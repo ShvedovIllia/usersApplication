@@ -1,26 +1,29 @@
+html {
+    height: 100%;
+}
+
 body {
     height: 100%;
     width: 100%;
+    margin: 0;
+}
+
+
+#wrapper {
+    display: flex;
+    height: 100%;
 }
 
 #showPanel {
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 70%;
     outline: 1px solid black;
-    height: 100%;
     overflow: auto;
     background-image: linear-gradient(black, white);
 }
 
 #controlPanel {
-    position: absolute;
-    right: 0;
-    top: 0;
     width: 30%;
     outline: 1px solid black;
-    height: 100%;
 }
 
 #nameOfPanel {
