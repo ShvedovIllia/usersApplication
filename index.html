@@ -29,8 +29,8 @@
                 <button onclick="sortByName()">Sort by name</button>
                 <button onclick="changeToJsonView()">Change to json view</button>
                 <div id="searchElement">
-                    <button onclick="searchByName()">Search by name</button>
-                    <input id="searchField" type="text">
+                    <button onchange="searchByName()">Search by name</button>
+                    <input oninput="searchByName()" id="searchField" type="text">
                 </div>
             </div>
             <div id="nameOfPanel">
@@ -58,6 +58,7 @@
                     <input id="cityOfNewCard" type="text"><br>
                     <button onclick="addCard()">Add card</button>
                     <button onclick="editCard()">Edit card</button>
+                    <button onclick="deleteCard()">Delete card</button>
                 </div>
             </div>
         </div>

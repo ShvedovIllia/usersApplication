@@ -1,62 +1,67 @@
-var result = document.getElementById('showResultJson');
+var resultTag = document.getElementById('showResultJson');
 var showResultTag = document.getElementById('showResult');
 var userCounter = document.getElementById('userCounter');
+var counter = new itemIdCounter();
+let status = false;
 var usersJson;
 var usersArray;
 
-fetch("https://jsonplaceholder.typicode.com/users").then(function (response) {
-    return response.json();
-}).then(
-    function (jsondata) {
-        usersJson = JSON.stringify(jsondata, null, 2);
+fetch("https://jsonplaceholder.typicode.com/users")
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (jsondata) {
+        usersJson = JsonStringify(jsondata);
         usersArray = JSON.parse(usersJson);
-    }
-)
+    })
 
 function changeToJsonView() {
     showResultTag.innerHTML = '<pre id="showResultJson"></pre>'
-    result = document.getElementById('showResultJson');
+    resultTag = document.getElementById('showResultJson');
     showResultTag = document.getElementById('showResult');
 }
 
 function showAllUsers() {
     usersArray = JSON.parse(usersJson);
-    result.innerHTML = usersJson;
-    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+    resultTag.innerHTML = usersJson;
+    changeCounterOnView();
 }
 
 function hideAllUsers() {
-    result.innerHTML = '';
+    resultTag.innerHTML = '';
     userCounter.innerHTML = 'Found 0 users! =(';
 }
 
 function toogleUsers() {
-    if (result.textContent == '') {
-        result.innerHTML = JSON.stringify(usersArray, null, 2);
-        userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+    if (resultTag.textContent == '') {
+        resultTag.innerHTML = JsonStringify(usersArray);
+        changeCounterOnView();
     } else {
         hideAllUsers();
     }
 }
-var changer = new changeStatus();
 
 function sortInReverseOrderById() {
-    let status = changer.change();
-    status == false ? usersArray.sort((a, b) => a.id - b.id) : usersArray.sort((a, b) => b.id - a.id);
-    result.innerHTML = JSON.stringify(usersArray, null, 2);
+    changeStatus();
+    sortUtil(usersArray, "id", status);
+    resultTag.innerHTML = JsonStringify(usersArray);
+    changeCounterOnView();
+}
+
+const JsonStringify = (json, replacer = null, space = 2) =>
+    JSON.stringify(json, replacer, space)
+
+function changeStatus() {
+    console.log(status);
+    status = !status
+}
+
+function changeCounterOnView() {
     userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 
-function changeStatus() {
-    let status;
-    this.change = function () {
-        status = !status;
-        return status;
-    }
-}
-
 function sortByName() {
-    let status = changer.change();
+    changeStatus();
     usersArray.sort((a, b) => {
         if (a.name.toUpperCase() > b.name.toUpperCase()) {
             return status == true ? 1 : -1;
@@ -66,35 +71,35 @@ function sortByName() {
         }
         return 0;
     });
-    result.innerHTML = JSON.stringify(usersArray, null, 2);
-    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+    resultTag.innerHTML = JsonStringify(usersArray);
+    changeCounterOnView();
 }
 
+// function sortUtil(json, field, status) {
+//     console.log(json[0][field]);
+//     status ? json.sort((a, b) => a[field] - b[field]) : json.sort((a, b) => b[field] - a[field]);
+// }
+
 function searchByName() {
+    usersArray = JSON.parse(usersJson);
     let names = [];
     let searchValue = document.getElementById('searchField').value;
     for (let i = 0; i < usersArray.length; i++) {
-        if (usersArray[i].name.match(searchValue)) {
+        if (usersArray[i].name.toUpperCase().match(searchValue.toUpperCase())) {
             names.push(usersArray[i]);
         }
     }
-    result.innerHTML = JSON.stringify(usersArray, null, 2);
-    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+    usersArray = names;
+    resultTag.innerHTML = JsonStringify(names);
+    changeCounterOnView();
 }
-var counter = new itemIdCounter();
 
 function changeShowPanelToCards() {
     hideAllUsers();
+    hideAllCards();
     for (let i = 0; i < usersArray.length; i++) {
-        createDivForCard();
-        document.getElementById('div' + counter.getCount()).innerHTML =
-            "<p class='classOfCards'>Id: " + usersArray[i].id + "</p>" +
-            "<p>Name: " + usersArray[i].name + "</p>" +
-            "<p>Username: " + usersArray[i].username + "</p>" +
-            "<p>Email: " + usersArray[i].email + "</p>" +
-            "<p>Phone: " + usersArray[i].phone + "</p>" +
-            "<p>Website: " + usersArray[i].website + "</p>" +
-            "<p>City: " + usersArray[i].address.city + "</p>";
+        createDivForCard(counter.increment());
+        document.getElementById('div' + counter.getCount()).innerHTML = getHtmlBasic(i); 
     }
 }
 
@@ -102,9 +107,10 @@ function hideAllCards() {
     showResultTag.innerHTML = '';
 }
 
-function getHtml() {
-    let html = "<div style='width: 70%; display:inline-block;'>" +
-        "<p class='classOfCards'>Id: " + document.getElementById('idOfNewCard').value + "</p>" +
+function getHtmlFromForm(id) {
+    let html =
+        "<div style='width: 70%; display:inline-block;'>" +
+        "<p class='classOfCards'>Id: " + id + "</p>" +
         "<p>Name: " + document.getElementById('nameOfNewCard').value + "</p>" +
         "<p>Username: " + document.getElementById('usernameOfNewCard').value + "</p>" +
         "<p>Email: " + document.getElementById('emailOfNewCard').value + "</p>" +
@@ -112,6 +118,7 @@ function getHtml() {
         "<p>Website: " + document.getElementById('websiteOfNewCard').value + "</p>" +
         "<p>City: " + document.getElementById('cityOfNewCard').value + "</p>" +
         "</div><div style='width: 30%; display:inline-block;'>" +
+        // "<button onclick=deleteCard() id='deleteButton" + id + "'>X</button>" +
         "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
     return html;
 }
@@ -123,8 +130,8 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "2px 2px 2px rgba(255,255,255,0.9);)";
 
 function addCard() {
-    createDivForCard();
-    document.getElementById('div' + counter.getCount()).innerHTML = getHtml();
+    createDivForCard(counter.increment());
+    document.getElementById('div' + counter.getCount()).innerHTML = getHtmlFromForm(counter.getCount());
 }
 
 function itemIdCounter() {
@@ -143,16 +150,46 @@ function editCard() {
     let pTagsInCards = document.getElementsByClassName('classOfCards');
     for (let i = 0; i < pTagsInCards.length; i++) {
         if (pTagsInCards[i].textContent == idToChange) {
-            document.getElementById(pTagsInCards[i].parentElement.id).innerHTML = getHtml();
+            document.getElementById(pTagsInCards[i].parentElement.id).innerHTML = getHtmlFromForm(document.getElementById('idOfNewCard').value);
         }
     }
 }
 
-function createDivForCard() {
+function createDivForCard(id) {
     let div = document.createElement("div");
     div.setAttribute('style', 'width: 100%;');
-    div.id = 'div' + counter.increment();
+    div.id = 'div' + id;
     div.setAttribute('style', style);
     showResultTag.appendChild(div);
     return div;
+}
+
+function deleteCard() {
+    let idToChange = 'Id: ' + document.getElementById('idOfNewCard').value;
+    let pTagsInCards = document.getElementsByClassName('classOfCards');
+    for (let i = 0; i < pTagsInCards.length; i++) {
+        if (pTagsInCards[i].textContent == idToChange) {
+            usersArray.splice(i, 1);
+        }
+    }
+    console.log(usersArray);
+    hideAllCards();
+    for (let i = 0; i < usersArray.length; i++) {
+        createDivForCard(usersArray[i].id);
+        document.getElementById('div' + usersArray[i].id).innerHTML = getHtmlBasic(i); 
+    }
+}
+function getHtmlBasic (counterOfArrayIteration) {
+    let html = "<div style='width: 70%; display:inline-block;'>" +
+    "<p class='classOfCards'>Id: " + usersArray[counterOfArrayIteration].id + "</p>" +
+    "<p>Name: " + usersArray[counterOfArrayIteration].name + "</p>" +
+    "<p>Username: " + usersArray[counterOfArrayIteration].username + "</p>" +
+    "<p>Email: " + usersArray[counterOfArrayIteration].email + "</p>" +
+    "<p>Phone: " + usersArray[counterOfArrayIteration].phone + "</p>" +
+    "<p>Website: " + usersArray[counterOfArrayIteration].website + "</p>" +
+    "<p>City: " + usersArray[counterOfArrayIteration].address.city + "</p>" +
+    "</div><div style='width: 30%; display:inline-block;'>" +
+    // "<button onclick=deleteCard() id='deleteButton" + usersArray[i].id + "'>X</button>" +
+    "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
+    return html;
 }
