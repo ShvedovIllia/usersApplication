@@ -75,10 +75,10 @@ function sortByName() {
     changeCounterOnView();
 }
 
-// function sortUtil(json, field, status) {
-//     console.log(json[0][field]);
-//     status ? json.sort((a, b) => a[field] - b[field]) : json.sort((a, b) => b[field] - a[field]);
-// }
+function sortUtil(json, field, status) {
+    console.log(json[0][field]);
+    status ? json.sort((a, b) => a[field] - b[field]) : json.sort((a, b) => b[field] - a[field]);
+}
 
 function searchByName() {
     usersArray = JSON.parse(usersJson);
@@ -99,7 +99,7 @@ function changeShowPanelToCards() {
     hideAllCards();
     for (let i = 0; i < usersArray.length; i++) {
         createDivForCard(counter.increment());
-        document.getElementById('div' + counter.getCount()).innerHTML = getHtmlBasic(i); 
+        document.getElementById('div' + counter.getCount()).innerHTML = getHtmlBasic(i);
     }
 }
 
@@ -131,6 +131,19 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
 
 function addCard() {
     createDivForCard(counter.increment());
+    let user = {
+        "id":document.getElementById('idOfNewCard').value,
+        "name":document.getElementById('nameOfNewCard').value,
+        "username":document.getElementById('usernameOfNewCard').value,
+        "email":document.getElementById('emailOfNewCard').value,
+        "phone":document.getElementById('phoneOfNewCard').value,
+        "website":document.getElementById('websiteOfNewCard').value,
+        "city":document.getElementById('cityOfNewCard').value
+    }
+    console.log(user);
+    user = JSON.stringify(user);
+    console.log(user);
+    usersArray.push(user);
     document.getElementById('div' + counter.getCount()).innerHTML = getHtmlFromForm(counter.getCount());
 }
 
@@ -150,7 +163,7 @@ function editCard() {
     let pTagsInCards = document.getElementsByClassName('classOfCards');
     for (let i = 0; i < pTagsInCards.length; i++) {
         if (pTagsInCards[i].textContent == idToChange) {
-            document.getElementById(pTagsInCards[i].parentElement.id).innerHTML = getHtmlFromForm(document.getElementById('idOfNewCard').value);
+            document.getElementById(pTagsInCards[i].parentElement.parentElement.id).innerHTML = getHtmlFromForm(document.getElementById('idOfNewCard').value);
         }
     }
 }
@@ -176,20 +189,21 @@ function deleteCard() {
     hideAllCards();
     for (let i = 0; i < usersArray.length; i++) {
         createDivForCard(usersArray[i].id);
-        document.getElementById('div' + usersArray[i].id).innerHTML = getHtmlBasic(i); 
+        document.getElementById('div' + usersArray[i].id).innerHTML = getHtmlBasic(i);
     }
 }
-function getHtmlBasic (counterOfArrayIteration) {
+
+function getHtmlBasic(counterOfArrayIteration) {
     let html = "<div style='width: 70%; display:inline-block;'>" +
-    "<p class='classOfCards'>Id: " + usersArray[counterOfArrayIteration].id + "</p>" +
-    "<p>Name: " + usersArray[counterOfArrayIteration].name + "</p>" +
-    "<p>Username: " + usersArray[counterOfArrayIteration].username + "</p>" +
-    "<p>Email: " + usersArray[counterOfArrayIteration].email + "</p>" +
-    "<p>Phone: " + usersArray[counterOfArrayIteration].phone + "</p>" +
-    "<p>Website: " + usersArray[counterOfArrayIteration].website + "</p>" +
-    "<p>City: " + usersArray[counterOfArrayIteration].address.city + "</p>" +
-    "</div><div style='width: 30%; display:inline-block;'>" +
-    // "<button onclick=deleteCard() id='deleteButton" + usersArray[i].id + "'>X</button>" +
-    "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
+        "<p class='classOfCards'>Id: " + usersArray[counterOfArrayIteration].id + "</p>" +
+        "<p>Name: " + usersArray[counterOfArrayIteration].name + "</p>" +
+        "<p>Username: " + usersArray[counterOfArrayIteration].username + "</p>" +
+        "<p>Email: " + usersArray[counterOfArrayIteration].email + "</p>" +
+        "<p>Phone: " + usersArray[counterOfArrayIteration].phone + "</p>" +
+        "<p>Website: " + usersArray[counterOfArrayIteration].website + "</p>" +
+        "<p>City: " + usersArray[counterOfArrayIteration].address.city + "</p>" +
+        "</div><div style='width: 30%; display:inline-block;'>" +
+        // "<button onclick=deleteCard() id='deleteButton" + usersArray[i].id + "'>X</button>" +
+        "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
     return html;
 }
