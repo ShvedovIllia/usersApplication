@@ -27,10 +27,9 @@
                 <button onclick="toogleUsers()">Toogle users</button>
                 <button onclick="sortInReverseOrderById()">Reverse order by id</button>
                 <button onclick="sortByName()">Sort by name</button>
-                <button onclick="changeToJsonView()">Change to json view</button>
+                <button onclick="changeView()">Change view</button>
                 <div id="searchElement">
-                    <button onchange="searchByName()">Search by name</button>
-                    <input oninput="searchByName()" id="searchField" type="text">
+                    <input oninput="searchByName()" placeholder="search" id="searchField" type="text">
                 </div>
             </div>
             <div id="nameOfPanel">
@@ -39,26 +38,22 @@
             </div>
             <div id="button">
                 <h3>Control panel</h3>
-                <button onclick="changeShowPanelToCards()">Change to card view</button>
                 <button onclick="hideAllCards()">Hide all</button>
                 <div id="cardMenu">
-                    <label for="idOfNewCard">ID: </label>
-                    <input id="idOfNewCard" type="text"><br>
                     <label for="nameOfNewCard">NAME: </label>
-                    <input id="nameOfNewCard" type="text"><br>
+                    <input id="nameOfNewCard" type="text" required><br>
                     <label for="usernameOfNewCard">USERNAME: </label>
-                    <input id="usernameOfNewCard" type="text"><br>
+                    <input id="usernameOfNewCard" type="text" required><br>
                     <label for="emailOfNewCard">EMAIL: </label>
-                    <input id="emailOfNewCard" type="text"><br>
+                    <input id="emailOfNewCard" type="text" required><br>
                     <label for="phoneOfnewCard">PHONE: </label>
-                    <input id="phoneOfNewCard" type="text"><br>
+                    <input id="phoneOfNewCard" type="text" required><br>
                     <label for="websiteOfNewCard">WEBSITE: </label>
-                    <input id="websiteOfNewCard" type="text"><br>
+                    <input id="websiteOfNewCard" type="text" required><br>
                     <label for="cityOfNewCard">CITY: </label>
-                    <input id="cityOfNewCard" type="text"><br>
+                    <input id="cityOfNewCard" type="text" required><br>
                     <button onclick="addCard()">Add card</button>
-                    <button onclick="editCard()">Edit card</button>
-                    <button onclick="deleteCard()">Delete card</button>
+                    <p id="errorMessage"></p>
                 </div>
             </div>
         </div>
