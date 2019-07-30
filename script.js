@@ -3,7 +3,8 @@ var showResultTag = document.getElementById('showResult');
 var userCounter = document.getElementById('userCounter');
 var errorMessageTag = document.getElementById('errorMessage');
 var counter = new itemIdCounter();
-let status = false;
+let status = true;
+let viewStatus = true;
 var usersJson;
 var usersArray;
 
@@ -46,7 +47,7 @@ function toogleUsers() {
 function sortInReverseOrderById() {
     changeStatus();
     sortUtil('number', usersArray, "id", status);
-    resultTag.innerHTML = JsonStringify(usersArray);
+    viewStatus ? changeToJsonView() : changeShowPanelToCards();
     changeCounterOnView();
 }
 
@@ -64,7 +65,7 @@ function changeCounterOnView() {
 function sortByName() {
     changeStatus();
     sortUtil('string', usersArray, "name", status);
-    resultTag.innerHTML = JsonStringify(usersArray);
+    viewStatus ? changeToJsonView() : changeShowPanelToCards();
     changeCounterOnView();
 }
 
@@ -91,7 +92,7 @@ function searchByName() {
     usersArray = JSON.parse(usersJson);
     let searchValue = document.getElementById('searchField').value;
     usersArray = usersArray.filter(user => user.name.toUpperCase().match(searchValue.toUpperCase()));
-    resultTag.innerHTML = JsonStringify(usersArray);
+    viewStatus ? changeToJsonView() : changeShowPanelToCards();
     changeCounterOnView();
 }
 
@@ -106,16 +107,8 @@ function changeShowPanelToCards() {
 }
 
 function changeView() {
-    changeStatus();
-    status ? changeToJsonView() : changeShowPanelToCards();
-}
-
-function showJson() {
-    console.log('showJson');
-}
-
-function showCards() {
-    console.log('showCards');
+    viewStatus = !viewStatus
+    viewStatus ? changeToJsonView() : changeShowPanelToCards();
 }
 
 function hideAllCards() {
@@ -146,7 +139,7 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "2px 2px 2px rgba(255,255,255,0.9);)";
 
 function addCard() {
-   
+
     let user = {
         "id": counter.getCount(),
         "name": document.getElementById('nameOfNewCard').value,
@@ -158,18 +151,14 @@ function addCard() {
             "city": document.getElementById('cityOfNewCard').value
         }
     }
-    console.log(user);
-    if(validationInput(user)) {
-        console.log(user);
+    if (validationInput(user)) {
         createDivForCard(counter.increment());
         user = JSON.stringify(user);
-        console.log(user);
         usersArray.push(JSON.parse(user));
-        console.log(user);
         document.getElementById('div' + counter.getCount()).innerHTML = getHtmlFromForm(counter.getCount());
     } else {
         errorMessageTag.innerHTML = 'Fields cannot be empty!'
-    }    
+    }
 }
 
 function itemIdCounter() {
@@ -194,32 +183,60 @@ function editCard(clickedId) {
     let pTagsInCards = document.getElementsByClassName('classOfCards');
     Array.from(pTagsInCards).forEach(tag => {
         if (tag.textContent == idToChange) {
-            usersArray[divId - 1].name = document.getElementById('nameOfNewCard').value;
-            usersArray[divId - 1].username = document.getElementById('usernameOfNewCard').value;
-            usersArray[divId - 1].email = document.getElementById('emailOfNewCard').value;
-            usersArray[divId - 1].phone = document.getElementById('phoneOfNewCard').value;
-            usersArray[divId - 1].website = document.getElementById('websiteOfNewCard').value;
-            usersArray[divId - 1].address.city = document.getElementById('cityOfNewCard').value;
-            if(validationInput(usersArray[divId - 1])) {
-                console.log(validationInput(usersArray[divId - 1]));
-                document.getElementById(tag.parentElement.parentElement.id).innerHTML = getHtmlFromForm(divId);
+            document.getElementById('nameOfNewCard').value = usersArray[divId - 1].name;
+            document.getElementById('usernameOfNewCard').value = usersArray[divId - 1].username;
+            document.getElementById('emailOfNewCard').value = usersArray[divId - 1].email;
+            document.getElementById('phoneOfNewCard').value = usersArray[divId - 1].phone;
+            document.getElementById('websiteOfNewCard').value = usersArray[divId - 1].website;
+            document.getElementById('cityOfNewCard').value = usersArray[divId - 1].address.city;
+            document.getElementById('idOfEditingCard').innerHTML = usersArray[divId - 1].id;
+        }
+    });
+    document.getElementById('editPanel').setAttribute('style', 'display: block');
+    document.getElementById('addCard').setAttribute('style', 'display: none');
+}
+
+function saveEdit() {
+    let id = document.getElementById('idOfEditingCard').textContent;
+    let idToChange = 'Id: ' + id;
+    let pTagsInCards = document.getElementsByClassName('classOfCards');
+    Array.from(pTagsInCards).forEach(tag => {
+        if (tag.textContent == idToChange) {
+            usersArray[id - 1].name = document.getElementById('nameOfNewCard').value;
+            usersArray[id - 1].username = document.getElementById('usernameOfNewCard').value;
+            usersArray[id - 1].email = document.getElementById('emailOfNewCard').value;
+            usersArray[id - 1].phone = document.getElementById('phoneOfNewCard').value;
+            usersArray[id - 1].website = document.getElementById('websiteOfNewCard').value;
+            usersArray[id - 1].address.city = document.getElementById('cityOfNewCard').value;
+            if (validationInput(usersArray[id - 1])) {
+                document.getElementById(tag.parentElement.parentElement.id).innerHTML = getHtmlFromForm(id);
+                cancelEdit();
             } else {
-                console.log(validationInput(usersArray[divId - 1]));
                 errorMessageTag.innerHTML = 'Fields cannot be empty!'
             }
         }
     });
 }
 
+function cancelEdit() {
+    document.getElementById('nameOfNewCard').value = '';
+    document.getElementById('usernameOfNewCard').value = '';
+    document.getElementById('emailOfNewCard').value = '';
+    document.getElementById('phoneOfNewCard').value = '';
+    document.getElementById('websiteOfNewCard').value = '';
+    document.getElementById('cityOfNewCard').value = '';
+    document.getElementById('idOfEditingCard').innerHTML = '';
+    document.getElementById('editPanel').setAttribute('style', 'display: none');
+    document.getElementById('addCard').setAttribute('style', 'display: block');
+}
+
 function validationInput(user) {
     if (user.name == '' || user.username == '' || user.email == '' || user.phone == '' ||
-    user.website == '' || user.address.city == '') {
-        console.log('validation input returns false');
+        user.website == '' || user.address.city == '') {
         return false;
     } else {
-        console.log('validation input returns true');
         return true;
-    } 
+    }
 }
 
 function createDivForCard(id) {

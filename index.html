@@ -41,18 +41,24 @@
                 <button onclick="hideAllCards()">Hide all</button>
                 <div id="cardMenu">
                     <label for="nameOfNewCard">NAME: </label>
-                    <input id="nameOfNewCard" type="text" required><br>
+                    <input id="nameOfNewCard" type="text"><br>
                     <label for="usernameOfNewCard">USERNAME: </label>
-                    <input id="usernameOfNewCard" type="text" required><br>
+                    <input id="usernameOfNewCard" type="text"><br>
                     <label for="emailOfNewCard">EMAIL: </label>
-                    <input id="emailOfNewCard" type="text" required><br>
+                    <input id="emailOfNewCard" type="text"><br>
                     <label for="phoneOfnewCard">PHONE: </label>
-                    <input id="phoneOfNewCard" type="text" required><br>
+                    <input id="phoneOfNewCard" type="text"><br>
                     <label for="websiteOfNewCard">WEBSITE: </label>
-                    <input id="websiteOfNewCard" type="text" required><br>
+                    <input id="websiteOfNewCard" type="text"><br>
                     <label for="cityOfNewCard">CITY: </label>
-                    <input id="cityOfNewCard" type="text" required><br>
-                    <button onclick="addCard()">Add card</button>
+                    <input id="cityOfNewCard" type="text" ><br>
+                    <button id="addCard" onclick="addCard()">Add card</button>
+                    <div id="editPanel" style="display: none">
+                        <label for="idOfEditingCard">Id of editing card: </label>
+                        <label id="idOfEditingCard"></label><br>
+                        <button onclick="saveEdit()">Save</button>
+                        <button onclick="cancelEdit()">Cancel</button>
+                    </div>
                     <p id="errorMessage"></p>
                 </div>
             </div>
