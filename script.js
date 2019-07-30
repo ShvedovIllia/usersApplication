@@ -5,6 +5,7 @@ var errorMessageTag = document.getElementById('errorMessage');
 var counter = new itemIdCounter();
 let status = true;
 let viewStatus = true;
+let loading = true;
 var usersJson;
 var usersArray;
 
@@ -17,17 +18,21 @@ fetch("https://jsonplaceholder.typicode.com/users")
         usersArray = JSON.parse(usersJson);
     })
 
-function changeToJsonView() {
-    showResultTag.innerHTML = '<pre id="showResultJson"></pre>'
+function renderJsonView() {
+    showResultTag.innerHTML = '<h1 id="userCounter">Found ' + usersArray.length + ' user =(</h1>' +
+        '<pre id="showResultJson"></pre>';
     resultTag = document.getElementById('showResultJson');
     showResultTag = document.getElementById('showResult');
     resultTag.innerHTML = JsonStringify(usersArray);
-    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+    userCounterUpdate();
 }
+
+const userCounterUpdate = () => userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 
 function showAllUsers() {
     usersArray = JSON.parse(usersJson);
     resultTag.innerHTML = usersJson;
+    userCounterUpdate();
 }
 
 function hideAllUsers() {
@@ -38,15 +43,23 @@ function hideAllUsers() {
 function toogleUsers() {
     if (resultTag.textContent == '') {
         resultTag.innerHTML = JsonStringify(usersArray);
+        userCounterUpdate();
     } else {
         hideAllUsers();
     }
 }
 
 function sortInReverseOrderById() {
-    changeStatus();
-    usersArray.sort(sortUtil('number', "id", status));
-    changeViewConst();
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        changeStatus();
+        usersArray.sort(sortUtil('number', "id", status));
+        preloaderDraw(false);
+        rerender();
+        userCounterUpdate();
+    })
 }
 
 const JsonStringify = (json, replacer = null, space = 2) =>
@@ -57,10 +70,15 @@ function changeStatus() {
 }
 
 function sortByName() {
-    changeStatus();
-    usersArray.sort(sortUtil('string', "name", status));
-    sortUtil('string', usersArray, "name", status);
-    changeViewConst();
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        changeStatus();
+        usersArray.sort(sortUtil('string', "name", status));
+        preloaderDraw(false);
+        userCounterUpdate();
+    });
 }
 
 function sortUtil(typeOfSort, field, status) {
@@ -80,39 +98,57 @@ function sortUtil(typeOfSort, field, status) {
     };
 }
 
-function searchByEmail() {
-    usersArray = JSON.parse(usersJson);
-    let searchValueEmail = document.getElementById('searchFieldEmail').value;
-    usersArray = usersArray.filter(user => user.email.toUpperCase().match(searchValueEmail.toUpperCase()));
-    let searchValue = document.getElementById('searchField').value;
-    usersArray = usersArray.filter(user => user.name.toUpperCase().match(searchValue.toUpperCase()));
-    changeViewConst();
-    changeCounterOnView();
+function preloaderDraw(isPreloading) {
+    if (isPreloading) {
+        showResultTag.innerHTML = '<img src="https://media0.giphy.com/media/9UCStxAde7lK/giphy.gif?cid=790b76115d403c2e3868643236cbc2d6&rid=giphy.gif">';
+    } else {
+        rerender();
+    }
+
+}
+
+function search() {
+    let searchValueEmail;
+    let searchValue;
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        usersArray = JSON.parse(usersJson);
+        searchValueEmail = document.getElementById('searchFieldEmail').value;
+        usersArray = usersArray.filter(user => user.email.toUpperCase().match(searchValueEmail.toUpperCase()));
+        searchValue = document.getElementById('searchField').value;
+        usersArray = usersArray.filter(user => user.name.toUpperCase().match(searchValue.toUpperCase()));
+        preloaderDraw(false);
+        changeCounterOnView();
+        userCounterUpdate();
+    });
 }
 
 function changeShowPanelToCards() {
-    hideAllUsers();
-    hideAllCards();
     counter.reset();
-    usersArray.forEach(element => {
-        createDivForCard(counter.increment());
-        document.getElementById('div' + counter.getCount()).innerHTML = getHtmlBasic(counter.getCount() - 1);
-    });
+    showResultTag.innerHTML = '<h1 id="userCounter">Found ' + usersArray.length + ' user =(</h1>' +
+        '<pre id="showResultJson"></pre>';
     userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
-}
-//
-//
-//
-//Artem
-//
-//
-//
 
-const changeViewConst = () => viewStatus ? changeToJsonView() : changeShowPanelToCards();
+    usersArray.forEach((element, index) => {
+        createDivForCard(null, 'basic', index);
+    });
+
+
+}
+
+const rerender = _ => viewStatus ? renderJsonView() : changeShowPanelToCards();
 
 function changeView() {
-    viewStatus = !viewStatus
-    changeViewConst();
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        cleanUp();
+        viewStatus = !viewStatus;
+        preloaderDraw(false);
+    });
 }
 
 function hideAllCards() {
@@ -143,8 +179,33 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "2px 2px 2px rgba(255,255,255,0.9);)";
 
 function addCard() {
+    let user;
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+        user = createUser();
+    }).then(_ => {
+        validationInput(user).then(user => {
+            errorMessageTag.innerHTML = '';
+            createDivForCard();
+            user.id = counter.getCount();
+            user = JSON.stringify(user);
+            usersArray.push(JSON.parse(user));
+        }).catch(err => {
+            errorMessageTag.innerHTML = err;
+        }).finally(_ => preloaderDraw(false));
+    });
+
+}
+
+function cleanUp() {
+    hideAllCards();
+    hideAllUsers();
+}
+
+function createUser(id) {
     let user = {
-        "id": counter.getCount(),
+        "id": null,
         "name": document.getElementById('nameOfNewCard').value,
         "username": document.getElementById('usernameOfNewCard').value,
         "email": document.getElementById('emailOfNewCard').value,
@@ -154,18 +215,11 @@ function addCard() {
             "city": document.getElementById('cityOfNewCard').value
         }
     }
-    if (validationInput(user)) {
-        createDivForCard(counter.increment());
-        user = JSON.stringify(user);
-        usersArray.push(JSON.parse(user));
-        document.getElementById('div' + counter.getCount()).innerHTML = getHtmlFromForm(counter.getCount());
-    } else {
-        errorMessageTag.innerHTML = 'Fields cannot be empty!'
-    }
+    return user;
 }
 
 function itemIdCounter() {
-    let count = 0;
+    let count = -1;
     this.increment = function () {
         count++;
         return count;
@@ -182,42 +236,55 @@ function itemIdCounter() {
 function editCard(clickedId) {
     let idOfDeletedBlock = document.getElementById(clickedId).parentElement.parentElement.id;
     let divId = idOfDeletedBlock.replace('div', '');
-    let idToChange = 'Id: ' + divId;
-    let pTagsInCards = document.getElementsByClassName('classOfCards');
-    Array.from(pTagsInCards).forEach(tag => {
-        if (tag.textContent == idToChange) {
-            document.getElementById('nameOfNewCard').value = usersArray[divId - 1].name;
-            document.getElementById('usernameOfNewCard').value = usersArray[divId - 1].username;
-            document.getElementById('emailOfNewCard').value = usersArray[divId - 1].email;
-            document.getElementById('phoneOfNewCard').value = usersArray[divId - 1].phone;
-            document.getElementById('websiteOfNewCard').value = usersArray[divId - 1].website;
-            document.getElementById('cityOfNewCard').value = usersArray[divId - 1].address.city;
-            document.getElementById('idOfEditingCard').innerHTML = usersArray[divId - 1].id;
-        }
-    });
+    hideAllCards();
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        usersArray.forEach((user, index) => {
+            if (user.id == divId) {
+                document.getElementById('nameOfNewCard').value = usersArray[index].name;
+                document.getElementById('usernameOfNewCard').value = usersArray[index].username;
+                document.getElementById('emailOfNewCard').value = usersArray[index].email;
+                document.getElementById('phoneOfNewCard').value = usersArray[index].phone;
+                document.getElementById('websiteOfNewCard').value = usersArray[index].website;
+                document.getElementById('cityOfNewCard').value = usersArray[index].address.city;
+                document.getElementById('idOfEditingCard').innerHTML = usersArray[index].id;
+            }
+        });
+    }).finally(_ => preloaderDraw(false));
+
     document.getElementById('editPanel').setAttribute('style', 'display: block');
     document.getElementById('addCard').setAttribute('style', 'display: none');
 }
 
 function saveEdit() {
     let id = document.getElementById('idOfEditingCard').textContent;
-    let idToChange = 'Id: ' + id;
-    let pTagsInCards = document.getElementsByClassName('classOfCards');
-    Array.from(pTagsInCards).forEach(tag => {
-        if (tag.textContent == idToChange) {
-            usersArray[id - 1].name = document.getElementById('nameOfNewCard').value;
-            usersArray[id - 1].username = document.getElementById('usernameOfNewCard').value;
-            usersArray[id - 1].email = document.getElementById('emailOfNewCard').value;
-            usersArray[id - 1].phone = document.getElementById('phoneOfNewCard').value;
-            usersArray[id - 1].website = document.getElementById('websiteOfNewCard').value;
-            usersArray[id - 1].address.city = document.getElementById('cityOfNewCard').value;
-            if (validationInput(usersArray[id - 1])) {
-                document.getElementById(tag.parentElement.parentElement.id).innerHTML = getHtmlFromForm(id);
-                cancelEdit();
-            } else {
-                errorMessageTag.innerHTML = 'Fields cannot be empty!'
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        usersArray.forEach((user, index) => {
+            if (user.id == id) {
+                preloaderDraw(false);
+                let user = createUser(id);
+                validationInput(user).then(user => {
+                    let divToSearch = 'div' + id;
+                    document.getElementById(divToSearch).innerHTML = getHtmlFromForm(id);
+                    errorMessageTag.innerHTML = '';
+                    usersArray[index].name = user.name;
+                    usersArray[index].username = user.username;
+                    usersArray[index].email = user.email;
+                    usersArray[index].phone = user.phone;
+                    usersArray[index].website = user.website;
+                    usersArray[index].address.city = user.address.city;
+                    cancelEdit();
+                }).catch(err => {
+                    errorMessageTag.innerHTML = err;
+                });
+
             }
-        }
+        })
     });
 }
 
@@ -233,46 +300,57 @@ function cancelEdit() {
     document.getElementById('addCard').setAttribute('style', 'display: block');
 }
 
-//
-//
-//
-//Artem
-//
-//
-//
 function validationInput(user) {
-    if (user.name == '' || user.username == '' || user.email == '' || user.phone == '' ||
-        user.website == '' || user.address.city == '') {
-        return false;
-    } else {
-        return true;
-    }
+    return new Promise((resolve, reject) => {
+        if (!user.name || !user.username || !user.email || !user.phone || !user.website || !user.address.city) {
+            reject(new Error('Fields cannot be empty!'));
+        } else {
+            resolve(user);
+        }
+    })
 }
 
-function createDivForCard(id) {
+function createDivForCard(id = null, type = null, index = null) {
+    let idOfCurrentUser = counter.increment();
+    if (id != null) {
+        idOfCurrentUser = id;
+    }
     let div = document.createElement("div");
     div.setAttribute('style', 'width: 100%;');
-    div.id = 'div' + id;
+    div.id = 'div' + idOfCurrentUser;
     div.setAttribute('style', style);
+    if (type == 'basic') {
+        div.innerHTML = getHtmlBasic(index, idOfCurrentUser);
+    } else {
+        div.innerHTML = getHtmlFromForm(idOfCurrentUser);
+    }
     showResultTag.appendChild(div);
-    return div;
 }
 
 function deleteCard(clickedId) {
 
-    let idOfDeletedBlock = document.getElementById(clickedId).parentElement.parentElement.id;
-    let divId = idOfDeletedBlock.replace('div', '');
+    let idOfDeletedBlock = document.getElementById(clickedId).id;
+    let divId = idOfDeletedBlock.replace('deleteButton', '');
     hideAllCards();
-    usersArray = usersArray.filter(user => user.id != divId);
-    usersArray.forEach((element, index) => {
-        createDivForCard(element.id);
-        document.getElementById('div' + (element.id)).innerHTML = getHtmlBasic(index);
-    });
+    new Promise((resolve, reject) => {
+        preloaderDraw(true);
+        setTimeout(() => resolve(), 1500);
+    }).then(_ => {
+        usersArray = usersArray.filter(user => user.id != divId);
+        preloaderDraw(false);
+        showResultTag.innerHTML = '<h1 id="userCounter">Found ' + usersArray.length + ' user =(</h1>' +
+            '<pre id="showResultJson"></pre>';
+        userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
+        counter.reset()
+        usersArray.forEach((element, index) => {
+            createDivForCard(element.id, 'basic', index);
+        });
+    })
 }
 
-function getHtmlBasic(counterOfArrayIteration) {
+function getHtmlBasic(counterOfArrayIteration, id) {
     let html = "<div style='width: 70%; display:inline-block;'>" +
-        "<p class='classOfCards'>Id: " + usersArray[counterOfArrayIteration].id + "</p>" +
+        "<p class='classOfCards'>Id: " + id + "</p>" +
         "<p>Name: " + usersArray[counterOfArrayIteration].name + "</p>" +
         "<p>Username: " + usersArray[counterOfArrayIteration].username + "</p>" +
         "<p>Email: " + usersArray[counterOfArrayIteration].email + "</p>" +
@@ -280,8 +358,8 @@ function getHtmlBasic(counterOfArrayIteration) {
         "<p>Website: " + usersArray[counterOfArrayIteration].website + "</p>" +
         "<p>City: " + usersArray[counterOfArrayIteration].address.city + "</p>" +
         "</div><div style='width: 30%; display:inline-block;'>" +
-        "<button class='deleteButtonClass' onclick=deleteCard(this.id) id=" + usersArray[counterOfArrayIteration].id + "-deleteButton'>X</button>" +
-        "<button class='editButtonClass' onclick=editCard(this.id) id='editButton" + usersArray[counterOfArrayIteration].id + "'>Edit</button>" +
+        "<button class='deleteButtonClass' onclick=deleteCard(this.id) id='" + id + "deleteButton'>X</button>" +
+        "<button class='editButtonClass' onclick=editCard(this.id) id='editButton" + id + "'>Edit</button>" +
         "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
     return html;
 }
