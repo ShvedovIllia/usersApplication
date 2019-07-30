@@ -22,12 +22,12 @@ function changeToJsonView() {
     resultTag = document.getElementById('showResultJson');
     showResultTag = document.getElementById('showResult');
     resultTag.innerHTML = JsonStringify(usersArray);
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
 
 function showAllUsers() {
     usersArray = JSON.parse(usersJson);
     resultTag.innerHTML = usersJson;
-    changeCounterOnView();
 }
 
 function hideAllUsers() {
@@ -38,7 +38,6 @@ function hideAllUsers() {
 function toogleUsers() {
     if (resultTag.textContent == '') {
         resultTag.innerHTML = JsonStringify(usersArray);
-        changeCounterOnView();
     } else {
         hideAllUsers();
     }
@@ -46,9 +45,8 @@ function toogleUsers() {
 
 function sortInReverseOrderById() {
     changeStatus();
-    sortUtil('number', usersArray, "id", status);
-    viewStatus ? changeToJsonView() : changeShowPanelToCards();
-    changeCounterOnView();
+    usersArray.sort(sortUtil('number', "id", status));
+    changeViewConst();
 }
 
 const JsonStringify = (json, replacer = null, space = 2) =>
@@ -58,41 +56,37 @@ function changeStatus() {
     status = !status
 }
 
-function changeCounterOnView() {
-    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
-}
-
 function sortByName() {
     changeStatus();
+    usersArray.sort(sortUtil('string', "name", status));
     sortUtil('string', usersArray, "name", status);
-    viewStatus ? changeToJsonView() : changeShowPanelToCards();
-    changeCounterOnView();
+    changeViewConst();
 }
 
-function sortUtil(typeOfSort, json, field, status) {
+function sortUtil(typeOfSort, field, status) {
     switch (typeOfSort) {
         case 'number':
-            status ? json.sort((a, b) => a[field] - b[field]) : json.sort((a, b) => b[field] - a[field]);
-            break;
+            return (a, b) => status ? a[field] - b[field] : b[field] - a[field];
         case 'string':
-            json.sort((a, b) => {
+            return (a, b) => {
                 if (a.name.toUpperCase() > b.name.toUpperCase()) {
-                    return status == true ? 1 : -1;
+                    return status ? 1 : -1;
                 }
                 if (a.name.toUpperCase() < b.name.toUpperCase()) {
-                    return status == true ? -1 : 1;
+                    return status ? -1 : 1;
                 }
                 return 0;
-            });
-            break;
-    }
+            }
+    };
 }
 
-function searchByName() {
+function searchByEmail() {
     usersArray = JSON.parse(usersJson);
+    let searchValueEmail = document.getElementById('searchFieldEmail').value;
+    usersArray = usersArray.filter(user => user.email.toUpperCase().match(searchValueEmail.toUpperCase()));
     let searchValue = document.getElementById('searchField').value;
     usersArray = usersArray.filter(user => user.name.toUpperCase().match(searchValue.toUpperCase()));
-    viewStatus ? changeToJsonView() : changeShowPanelToCards();
+    changeViewConst();
     changeCounterOnView();
 }
 
@@ -104,11 +98,21 @@ function changeShowPanelToCards() {
         createDivForCard(counter.increment());
         document.getElementById('div' + counter.getCount()).innerHTML = getHtmlBasic(counter.getCount() - 1);
     });
+    userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 }
+//
+//
+//
+//Artem
+//
+//
+//
+
+const changeViewConst = () => viewStatus ? changeToJsonView() : changeShowPanelToCards();
 
 function changeView() {
     viewStatus = !viewStatus
-    viewStatus ? changeToJsonView() : changeShowPanelToCards();
+    changeViewConst();
 }
 
 function hideAllCards() {
@@ -139,7 +143,6 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "2px 2px 2px rgba(255,255,255,0.9);)";
 
 function addCard() {
-
     let user = {
         "id": counter.getCount(),
         "name": document.getElementById('nameOfNewCard').value,
@@ -230,6 +233,13 @@ function cancelEdit() {
     document.getElementById('addCard').setAttribute('style', 'display: block');
 }
 
+//
+//
+//
+//Artem
+//
+//
+//
 function validationInput(user) {
     if (user.name == '' || user.username == '' || user.email == '' || user.phone == '' ||
         user.website == '' || user.address.city == '') {
@@ -252,15 +262,8 @@ function deleteCard(clickedId) {
 
     let idOfDeletedBlock = document.getElementById(clickedId).parentElement.parentElement.id;
     let divId = idOfDeletedBlock.replace('div', '');
-    let idToChange = 'Id: ' + divId;
-    let pTagsInCards = document.getElementsByClassName('classOfCards');
-
-    pTagsInCards = Array.from(pTagsInCards).forEach((tag, index) => {
-        if (tag.textContent == idToChange) {
-            usersArray.splice(index, 1);
-        }
-    });
     hideAllCards();
+    usersArray = usersArray.filter(user => user.id != divId);
     usersArray.forEach((element, index) => {
         createDivForCard(element.id);
         document.getElementById('div' + (element.id)).innerHTML = getHtmlBasic(index);
@@ -277,7 +280,7 @@ function getHtmlBasic(counterOfArrayIteration) {
         "<p>Website: " + usersArray[counterOfArrayIteration].website + "</p>" +
         "<p>City: " + usersArray[counterOfArrayIteration].address.city + "</p>" +
         "</div><div style='width: 30%; display:inline-block;'>" +
-        "<button class='deleteButtonClass' onclick=deleteCard(this.id) id='deleteButton" + usersArray[counterOfArrayIteration].id + "'>X</button>" +
+        "<button class='deleteButtonClass' onclick=deleteCard(this.id) id=" + usersArray[counterOfArrayIteration].id + "-deleteButton'>X</button>" +
         "<button class='editButtonClass' onclick=editCard(this.id) id='editButton" + usersArray[counterOfArrayIteration].id + "'>Edit</button>" +
         "<img width=230px src='https://i.pinimg.com/originals/54/ce/4f/54ce4f9a4d20898ebdfcef56e380c9a3.jpg'></div>";
     return html;
