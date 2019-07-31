@@ -125,17 +125,23 @@ function search() {
     });
 }
 
+let isFirstShow = true;
 function changeShowPanelToCards() {
     counter.reset();
     showResultTag.innerHTML = '<h1 id="userCounter">Found ' + usersArray.length + ' user =(</h1>' +
         '<pre id="showResultJson"></pre>';
     userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 
-    usersArray.forEach((element, index) => {
-        createDivForCard(null, 'basic', index);
-    });
-
-
+    if (isFirstShow) {
+        usersArray.forEach((element, index) => {
+            createDivForCard(null, 'basic', index);
+        });
+        isFirstShow = false;
+    } else {
+        usersArray.forEach((element, index) => {
+            createDivForCard(element.id, 'basic', index);
+        });
+    }
 }
 
 const rerender = _ => viewStatus ? renderJsonView() : changeShowPanelToCards();
@@ -176,7 +182,7 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "background-color: aliceblue; box-shadow:" +
     "inset 0 5px 3px rgba(255,255,255,0.3), " +
     "inset 0 -5px 3px rgba(0,0,0,0.3)," +
-    "2px 2px 2px rgba(255,255,255,0.9);)";
+    "2px 2px 2px rgba(255,255,255,0.9);) ";
 
 function addCard() {
     let user;
@@ -195,7 +201,6 @@ function addCard() {
             errorMessageTag.innerHTML = err;
         }).finally(_ => preloaderDraw(false));
     });
-
 }
 
 function cleanUp() {
@@ -229,6 +234,10 @@ function itemIdCounter() {
     }
     this.reset = function () {
         count = 0;
+        return count;
+    }
+    this.setValue = function (setValueNumber) {
+        count = setValueNumber;
         return count;
     }
 }
@@ -271,7 +280,6 @@ function saveEdit() {
                 validationInput(user).then(user => {
                     let divToSearch = 'div' + id;
                     document.getElementById(divToSearch).innerHTML = getHtmlFromForm(id);
-                    errorMessageTag.innerHTML = '';
                     usersArray[index].name = user.name;
                     usersArray[index].username = user.username;
                     usersArray[index].email = user.email;
@@ -282,7 +290,6 @@ function saveEdit() {
                 }).catch(err => {
                     errorMessageTag.innerHTML = err;
                 });
-
             }
         })
     });
@@ -298,6 +305,7 @@ function cancelEdit() {
     document.getElementById('idOfEditingCard').innerHTML = '';
     document.getElementById('editPanel').setAttribute('style', 'display: none');
     document.getElementById('addCard').setAttribute('style', 'display: block');
+    errorMessageTag.innerHTML = ''
 }
 
 function validationInput(user) {
@@ -307,14 +315,15 @@ function validationInput(user) {
         } else {
             resolve(user);
         }
-    })
+    });
 }
 
 function createDivForCard(id = null, type = null, index = null) {
-    let idOfCurrentUser = counter.increment();
+    let idOfCurrentUser;
     if (id != null) {
         idOfCurrentUser = id;
-    }
+        counter.setValue(id);
+    } else idOfCurrentUser = counter.increment();
     let div = document.createElement("div");
     div.setAttribute('style', 'width: 100%;');
     div.id = 'div' + idOfCurrentUser;
@@ -328,7 +337,6 @@ function createDivForCard(id = null, type = null, index = null) {
 }
 
 function deleteCard(clickedId) {
-
     let idOfDeletedBlock = document.getElementById(clickedId).id;
     let divId = idOfDeletedBlock.replace('deleteButton', '');
     hideAllCards();
@@ -345,7 +353,7 @@ function deleteCard(clickedId) {
         usersArray.forEach((element, index) => {
             createDivForCard(element.id, 'basic', index);
         });
-    })
+    });
 }
 
 function getHtmlBasic(counterOfArrayIteration, id) {
