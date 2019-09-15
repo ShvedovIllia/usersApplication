@@ -104,7 +104,6 @@ function preloaderDraw(isPreloading) {
     } else {
         rerender();
     }
-
 }
 
 function search() {
@@ -126,22 +125,17 @@ function search() {
 }
 
 let isFirstShow = true;
+
 function changeShowPanelToCards() {
     counter.reset();
     showResultTag.innerHTML = '<h1 id="userCounter">Found ' + usersArray.length + ' user =(</h1>' +
         '<pre id="showResultJson"></pre>';
     userCounter.innerHTML = 'Found ' + usersArray.length + ' users!';
 
-    if (isFirstShow) {
-        usersArray.forEach((element, index) => {
-            createDivForCard(null, 'basic', index);
-        });
-        isFirstShow = false;
-    } else {
-        usersArray.forEach((element, index) => {
-            createDivForCard(element.id, 'basic', index);
-        });
-    }
+    usersArray.forEach((element, index) => {
+        createDivForCard(isFirstShow ? null : element.id, 'basic', index);
+    })
+    isFirstShow = false;
 }
 
 const rerender = _ => viewStatus ? renderJsonView() : changeShowPanelToCards();
@@ -185,13 +179,11 @@ var style = "border: 1px solid black; border-radius: 10px; margin: 20px; padding
     "2px 2px 2px rgba(255,255,255,0.9);) ";
 
 function addCard() {
-    let user;
     new Promise((resolve, reject) => {
-        preloaderDraw(true);
-        setTimeout(() => resolve(), 1500);
-        user = createUser();
-    }).then(_ => {
-        validationInput(user).then(user => {
+            preloaderDraw(true);
+            setTimeout(() => resolve(createUser()), 1500);
+        }).then(user => validationInput(user))
+        .then(user => {
             errorMessageTag.innerHTML = '';
             createDivForCard();
             user.id = counter.getCount();
@@ -200,7 +192,6 @@ function addCard() {
         }).catch(err => {
             errorMessageTag.innerHTML = err;
         }).finally(_ => preloaderDraw(false));
-    });
 }
 
 function cleanUp() {
@@ -262,7 +253,6 @@ function editCard(clickedId) {
             }
         });
     }).finally(_ => preloaderDraw(false));
-
     document.getElementById('editPanel').setAttribute('style', 'display: block');
     document.getElementById('addCard').setAttribute('style', 'display: none');
 }
